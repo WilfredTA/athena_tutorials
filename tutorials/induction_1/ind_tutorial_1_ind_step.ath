@@ -1,7 +1,7 @@
 load "nat-minus"
 module Factorial {
 
-   define [< - * one <=] := [N.< N.- N.* N.one N.<= ]
+   define [< - * one <=] := [N.< N.- N.* N.one N.<=]
 
     declare factorial: [N] -> N [[int->nat]]
     (transform-output eval [nat->int])
@@ -12,6 +12,7 @@ module Factorial {
 
     assert f_one := (forall x . one = x ==> (factorial x) = one)
 
+    assert* all_x := (x = zero | x = one | one < x)
     (eval (factorial 4))
     (eval (factorial 5))
 
@@ -37,7 +38,32 @@ module Factorial {
         | (m as (S n)) => conclude inductive_step := ((factorial (m - one)) <= (factorial m))
                     let {
                         ih := ((factorial (n - one)) <= (factorial n));
-                        _ := (!claim ih)
+                        _ := (!claim ih);
+                        n-lt-m := (!chain-> [
+                            true 
+                            ==> (n < (S n)) [N.Less.<S]
+                            ==> (n < m)     [((S n) = m)]
+                        ]);
+                        m-not-zero := (!chain-> [
+                            true ==> (m =/= zero) [N.S-not-zero]
+                        ]);
+                        zero-lt-m := (!chain-> [
+                            true ==> (zero < m) [N.Less.zero<S]
+                        ]);
+                        one-lte-m := conclude (one <= m)
+                                        (!chain-> [
+                                           (zero < m)
+                                            ==> ((S zero) <= m)             [N.Less=.discrete]
+                                            ==> (one <= m)
+                                        ]);
+                        one_lt_m_or_eq_m := (!mp (!left-iff (!uspec* lte-def [one m])) one-lte-m);
+                                        
+                        _ := (!cases one_lt_m_or_eq_m
+                            assume (one < m)
+                               (!force true)
+                            assume (one = m)
+                                (!force true)
+                        )
                     }
                     (!force inductive_step)
     }
