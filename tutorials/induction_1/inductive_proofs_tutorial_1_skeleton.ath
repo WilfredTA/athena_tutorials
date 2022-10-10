@@ -26,6 +26,6 @@ module Factorial {
                         
                     
         | (m as (S n)) => conclude inductive_step := ((factorial (m - one)) <= (factorial m))
-                    (!force base_case)
+                    (!force inductive_step)
     }
 }

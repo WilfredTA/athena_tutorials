@@ -1,4 +1,5 @@
 load "nat-minus"
+load "nat-less"
 module Factorial {
 
    define [< - * one <=] := [N.< N.- N.* N.one N.<=]
@@ -12,14 +13,17 @@ module Factorial {
 
     assert f_one := (forall x . one = x ==> (factorial x) = one)
 
+    assert least_f := (forall x . one <= (factorial x))
     assert* all_x := (x = zero | x = one | one < x)
     (eval (factorial 4))
     (eval (factorial 5))
 
+    assert x_times_y := (forall x y . one < x & zero < y ==> one < (x * y))
+    assert x_lt_y_to_x_lte_sub1 := (forall x y . x < S y ==> x <= y)
     define nothing-less-than-zero := (forall x . ~ x < zero)
     
     define f_x_less_than := (forall x . factorial (x - one) <= factorial x )
-    define lte-def := (forall x y . (x <= y <==> x < y | x = y))
+    define [lte-def] := N.Less=.<=-def
 
     by-induction f_x_less_than {
         zero => conclude base_case := (factorial (zero - one) <= factorial zero)
@@ -32,7 +36,7 @@ module Factorial {
                             ]);
                             f_zero-1_eq_or_lt_f_zero := (!right-either (factorial (zero - one) < (factorial zero))  f_zero-1_eq_f_zero)
                         }
-                        (!mp (!right-iff (!uspec* lte-def [(factorial (zero - one)) (factorial zero)])) f_zero-1_eq_or_lt_f_zero)
+                        (!mp (!right-iff (!uspec* lte-def [(factorial zero) (factorial (zero - one))])) f_zero-1_eq_or_lt_f_zero)
                         
                     
         | (m as (S n)) => conclude inductive_step := ((factorial (m - one)) <= (factorial m))
@@ -56,15 +60,41 @@ module Factorial {
                                             ==> ((S zero) <= m)             [N.Less=.discrete]
                                             ==> (one <= m)
                                         ]);
-                        one_lt_m_or_eq_m := (!mp (!left-iff (!uspec* lte-def [one m])) one-lte-m);
-                                        
-                        _ := (!cases one_lt_m_or_eq_m
-                            assume (one < m)
-                               (!force true)
-                            assume (one = m)
-                                (!force true)
-                        )
-                    }
-                    (!force inductive_step)
+                        one_lt_m_or_eq_m := (!mp (!left-iff (!uspec* lte-def [m one])) one-lte-m)
+                    }        
+                    (!cases one_lt_m_or_eq_m
+                        assume (one < m)
+                            # If one < m, then m-1 >= one. forall x y. one < x & zero < y ==> one < x * y
+                            # let's establish that one < m. Therefore, zero < (m - one).
+                            # Further, zero < fact (m - one) by definition 
+                            # From these facts, we can conclude that fact m = m * fact (m - one) and that 
+                            # one < m * fact (m - one).
+                            # From this, we use lte-def to derive the conclusion that one <=
+                            let {   fm_eq_mxfm-1 := (!chain-> [
+                                                        (factorial m) = (m * (factorial (m - one))) [f_x] 
+                                    ]);
+                                    one-lte-n := conclude (one <= n)
+                                                   (!mp (!uspec* x_lt_y_to_x_lte_sub1 [one n]) (one < m));
+                                    one-lte-n-disj := (!mp (!left-iff (!uspec* lte-def [n one])) one-lte-n)
+                            }
+                            (!cases one-lte-n-disj 
+                                assume (one < n)
+                                    let {
+                                        Sz-lt-n := (!chain-> [
+                                            (one < n) ==> ((S zero) < n) [(one = (S zero))]
+                                        ]);
+                                        zero-lt-n := conclude (zero < n)
+                                                        (!mp (!uspec* N.Less.S1 [zero n]) ((S zero) < n))
+                                    }
+                                    (!force inductive_step)
+                                    # (!mp (!uspec* x_times_y [m n]) (!both (one < m) (zero < n)))
+                                assume (one = n)
+                                    (!force inductive_step)
+                            )
+                         
+                        assume (one = m)
+                            (!force inductive_step)
+                    )
+                   
     }
 }

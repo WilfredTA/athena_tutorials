@@ -1,7 +1,7 @@
 load "nat-minus"
 module Factorial {
 
-   define [< - * one <=] := [N.< N.- N.* N.one N.<= ]
+    define [< - * one <=] := [N.< N.- N.* N.one N.<= ]
 
     declare factorial: [N] -> N [[int->nat]]
     (transform-output eval [nat->int])
@@ -18,7 +18,7 @@ module Factorial {
     define nothing-less-than-zero := (forall x . ~ x < zero)
     
     define f_x_less_than := (forall x . factorial (x - one) <= factorial x )
-    define lte-def := (forall x y . (x <= y <==> x < y | x = y))
+    define [lte-def] := N.Less=.<=-def
 
     by-induction f_x_less_than {
         zero => conclude base_case := (factorial (zero - one) <= factorial zero)
