@@ -3,7 +3,7 @@ load "nat-less"
 module Factorial {
     declare factorial: [N] -> N [fact [int->nat]]
     
-    define [< * one zero <=] := [N.< N.* N.one N.zero N.<= ]
+    define [< * one zero <=] := [N.< N.* (S N.zero) N.zero N.<= ]
     define [n m k] := [?n:N ?m:N ?k:N]
     
 
@@ -24,8 +24,7 @@ module Factorial {
                     (fact zero)
                     = one                                   [fact-def]
                     = (fact one)                            [fact-def]
-                    = (fact S zero)                         [(one = S zero)]
-                    ==> ((fact zero) <= (fact (S zero)))    [lte-def]
+                    ==> ((fact zero) <= (fact one))         [lte-def]
         ])
         | (S zero) => (!force (fact S zero <= fact S S zero))
         | (n as (S m)) => (!force (fact S m <= fact S S m))
