@@ -37,8 +37,7 @@ module Factorial {
                             f_zero-1_eq_or_lt_f_zero := (!right-either (factorial (zero - one) < (factorial zero))  f_zero-1_eq_f_zero)
                         }
                         (!mp (!right-iff (!uspec* lte-def [(factorial zero) (factorial (zero - one))])) f_zero-1_eq_or_lt_f_zero)
-                        
-                    
+
         | (m as (S n)) => conclude inductive_step := ((factorial (m - one)) <= (factorial m))
                     let {
                         ih := ((factorial (n - one)) <= (factorial n));
@@ -64,12 +63,6 @@ module Factorial {
                     }        
                     (!cases one_lt_m_or_eq_m
                         assume (one < m)
-                            # If one < m, then m-1 >= one. forall x y. one < x & zero < y ==> one < x * y
-                            # let's establish that one < m. Therefore, zero < (m - one).
-                            # Further, zero < fact (m - one) by definition 
-                            # From these facts, we can conclude that fact m = m * fact (m - one) and that 
-                            # one < m * fact (m - one).
-                            # From this, we use lte-def to derive the conclusion that one <=
                             let {   fm_eq_mxfm-1 := (!chain-> [
                                                         (factorial m) = (m * (factorial (m - one))) [f_x] 
                                     ]);
@@ -91,7 +84,6 @@ module Factorial {
                                 assume (one = n)
                                     (!force inductive_step)
                             )
-                         
                         assume (one = m)
                             (!force inductive_step)
                     )

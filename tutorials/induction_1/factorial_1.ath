@@ -1,0 +1,16 @@
+
+
+module Factorial {
+   define [* - <] := [times minus less?]
+
+   define factorial := lambda (n) (
+                        check {
+                            (n < 1) => 1
+                            | else => (* (factorial(n - 1)) n)
+                        }
+                    )
+   
+
+    (eval factorial(5))
+
+}

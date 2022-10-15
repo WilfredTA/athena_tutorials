@@ -1,0 +1,18 @@
+load "nat-less"
+(transform-output eval [nat->int])
+module Factorial {
+    declare factorial: [N] -> N [fact [int->nat]]
+    
+    define [< * one zero <=] := [N.< N.* N.one N.zero N.<= ]
+    define [n m k] := [?n:N ?m:N ?k:N]
+    
+
+
+    assert* fact-def := [
+        (fact zero = one)
+        (fact one = one)
+        (fact S n = S n * fact n)
+    ]
+
+    (eval fact 5) # 120
+}

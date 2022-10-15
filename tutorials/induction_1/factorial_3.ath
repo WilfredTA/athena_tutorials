@@ -1,0 +1,26 @@
+load "nat-less"
+(transform-output eval [nat->int])
+module Factorial {
+    declare factorial: [N] -> N [fact [int->nat]]
+    
+    define [< * one zero <=] := [N.< N.* N.one N.zero N.<= ]
+    define [n m k] := [?n:N ?m:N ?k:N]
+    
+
+
+    assert* fact-def := [
+        (fact zero = one)
+        (fact one = one)
+        (fact S n = S n * fact n)
+    ]
+
+    (eval fact 5) # 120
+
+    define theorem := (forall n . fact n N.<= fact S n)
+    by-induction theorem {
+        zero => (!force (fact zero <= fact S zero))
+        | (S zero) => (!force (fact S zero <= fact S S zero))
+        | (n as (S m)) => (!force (fact S m <= fact S S m))
+    }
+}
+
