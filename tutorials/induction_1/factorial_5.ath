@@ -27,15 +27,14 @@ module Factorial {
                     ==> ((fact zero) <= (fact one))         [lte-def]
         ])
         | (S zero) => (!chain-> [
-                         (fact (S one)) 
-                         = ((S one) * (fact one))                       [fact-def]
-                         = (two * (fact one))
+                         (fact two) 
+                         = (two * (fact one))               [fact-def]
                          = (two * one)              
-                         = two                                          [(forall x . x * one = x)]
-                         ==> (one < two)          
-                         ==> (fact one < fact two)
-                         ==> (fact one <= fact two)                     [lte-def]  
-                         ==> (fact (S zero) <= fact (S S zero))
+                         = two                                          
+                         ==> (one < two)
+                         ==> (fact one < fact two)          
+                         ==> (fact one <= fact two)         [lte-def]
+                                          
         ])
         | (n as (S m)) => (!force (fact S m <= fact S S m))
     }
