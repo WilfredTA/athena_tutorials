@@ -20,10 +20,5 @@ module Factorial {
     define [lte-def] := N.Less=.<=-def
     define theorem := (forall n . fact n N.<= fact S n)
 
-    define (make-induction-goal x) := (fact x <= fact S x)
-    by-induction theorem {
-        zero => (!prove (make-induction-goal zero) (ab))
-        | (one as (S zero)) => (!prove (make-induction-goal one) (ab))
-        | (n as (S m)) => (!prove (make-induction-goal n) (ab))
-    }
+    (!n-induction theorem)
 }

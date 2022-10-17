@@ -17,13 +17,50 @@ module Factorial {
 
     (eval fact 5) # 120
 
+    define num_times_x_gt_x := (forall n m . ~ (S n * m < m))
+    
+    (!prove num_times_x_gt_x (ab))
+
+
     define [lte-def] := N.Less=.<=-def
     define theorem := (forall n . fact n N.<= fact S n)
-
-    define (make-induction-goal x) := (fact x <= fact S x)
     by-induction theorem {
-        zero => (!prove (make-induction-goal zero) (ab))
-        | (one as (S zero)) => (!prove (make-induction-goal one) (ab))
-        | (n as (S m)) => (!prove (make-induction-goal n) (ab))
+        zero => (!chain-> [
+                    (fact zero)
+                    = one                                   [fact-def]
+                    = (fact one)                            [fact-def]
+                    ==> ((fact zero) <= (fact one))         [lte-def]
+        ])
+        | (S zero) => (!chain-> [
+                         (fact two) 
+                         = (two * (fact one))               [fact-def]
+                         = (two * one)              
+                         = two                                          
+                         ==> (one < two)
+                         ==> (fact one < fact two)          
+                         ==> (fact one <= fact two)         [lte-def]
+                                          
+        ])
+        | (n as (S m)) => conclude goal := (fact S m <= fact S S m)
+                            let {
+                                ih := (fact m <= fact S m);
+                                _ := (!claim ih)
+                            }
+                            (!by-contradiction goal 
+                                assume contra := (~ goal)
+                                 let {
+                                     ssm_lt_sm :=
+                                    (!chain-> [
+                                         contra 
+                                        ==> (fact S S m < fact S m) [N.Less=.trichotomy1]
+                                        ==> (((S S m) * fact S m) < fact S m ) [fact-def]
+                                    ]);
+                                    neg_ssm_lt_sm := (!chain-> [
+                                        ssm_lt_sm
+                                        ==> (~ (S S m) * (fact S m) < fact S m) [num_times_x_gt_x]
+                                    ])
+                                 }
+                                (!absurd neg_ssm_lt_sm ssm_lt_sm)
+                            )
     }
 }
