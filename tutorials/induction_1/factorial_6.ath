@@ -57,7 +57,7 @@ module Factorial {
                                     ]);
                                     neg_ssm_lt_sm := (!chain-> [
                                         ssm_lt_sm
-                                        ==> (~ (S S m) * (fact S m) < fact S m) [num_times_x_gt_x]
+                                        ==> (~ ssm_lt_sm) [num_times_x_gt_x]
                                     ])
                                  }
                                 (!absurd neg_ssm_lt_sm ssm_lt_sm)
